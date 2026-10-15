@@ -1,0 +1,34 @@
+# GitHub Actions Workflow: Android Full Build
+
+name: Android Full Build
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  # 1️⃣ بناء تطبيق الويب (Next.js)
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - Node.js 20 + npm ci
+      - npm run build
+      - رفع الـ artifacts
+
+  # 2️⃣ بناء تطبيق الأندرويد
+  android:
+    needs: web
+    runs-on: ubuntu-latest
+    steps:
+      - JDK 17 (Temurin)
+      - Android SDK
+      - Gradle: assembleDebug + assembleRelease
+      - التوقيع الاختياري (مع ANDROID_KEYSTORE_BASE64)
+      - رفع APK/AAB
+
+  # 3️⃣ إنشاء Release على GitHub تلقائياً
+  release:
+    if: tag (v1.0.0...)
+    needs: android
+    - رفع APK إلى Release
